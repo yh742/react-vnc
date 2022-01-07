@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { createRef, useState } from 'react';
 import './App.css';
 import { VncScreen } from './lib';
+import { RFBHandler } from './lib/VncScreen';
 
 function App() {
   const [vncUrl, setVncUrl] = useState('');
   const [inputUrl, setInputUrl] = useState('');
+  const ref = createRef<RFBHandler>();
+
+  const onButtonClick = ()=> {
+    ref.current!.sendKey(0xffe3, "ControlLeft", true);
+    ref.current!.sendKey(0xffe9, "AltLeft", true);
+    ref.current!.sendKey(0xffff, "Delete", true);
+    ref.current!.sendKey(0xffe3, "ControlLeft", false);
+    ref.current!.sendKey(0xffe9, "AltLeft", false);
+    ref.current!.sendKey(0xffff, "Delete", false);
+  }
 
   const isValid = (vncUrl: string) => {
     if (!vncUrl.startsWith('ws://') && !vncUrl.startsWith('wss://')) {
@@ -49,11 +60,15 @@ function App() {
                   width: '75vw',
                   height: '75vh',
                 }}
+                ref={ref}
                 debug
               />
             )
             : <div>VNC URL not provided.</div>
         }
+      <div>
+        <button onClick={onButtonClick}>ctrl+alt+del</button>
+      </div>
       </div>
     </>
   );

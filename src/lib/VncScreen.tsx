@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState, useImperativeHandle } from 'react';
 import RFB from '../noVNC/core/rfb';
+import loader from './assets/loading.gif';
 
 interface Props {
     url: string;
@@ -19,10 +20,20 @@ interface Props {
     debug?: boolean;
 }
 
-export default function VncScreen(props: Props) {
+export type RFBHandler = {
+    sendKey: (key: number, code: string, down: boolean)=> void,
+};
+
+export const VncScreen = forwardRef((props: Props, ref: React.Ref<RFBHandler>)=> {
     const [rfb, setRfb] = useState<RFB | null>(null);
     const screen = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState<boolean>(true);
+
+    useImperativeHandle(ref, ()=>({
+        sendKey: (key: number, code: string, down: boolean)=> {
+            rfb?.sendKey(key, code, down);
+        }
+    }));
 
     const {
         url,
@@ -134,16 +145,28 @@ export default function VncScreen(props: Props) {
         rfb.blur();
     };
 
+    console.log(screen.current?.offsetWidth);
+    console.log(screen.current?.scrollTop, screen.current?.offsetHeight, screen.current?.offsetTop)
+
     return (
         <>
+                    
             <div
                 style={style}
                 className={className}
                 ref={screen}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-            />
-            {loading && <div className="text-white loading">Loading...</div>}
+            >
+                
+            </div>
+            {loading?
+            <div style={{
+                color: 'white', 
+                position: 'absolute', 
+                left: screen.current?.offsetWidth!/2 , 
+                top: (screen.current?.offsetHeight!/2 + screen.current?.offsetTop!/2),
+            }}><img alt='loading' src={loader} style={{height: '60px'}} /></div>: null}
         </>
     );
-}
+});

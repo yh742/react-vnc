@@ -1,2 +1,2 @@
-import VncScreen from './VncScreen';
+import { VncScreen } from './VncScreen';
 export { VncScreen };
