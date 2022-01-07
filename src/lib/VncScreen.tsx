@@ -1,7 +1,5 @@
 import { forwardRef, useEffect, useRef, useState, useImperativeHandle } from 'react';
 import RFB from '../noVNC/core/rfb';
-import loader from './assets/loading.gif';
-
 interface Props {
     url: string;
     style?: object;
@@ -18,6 +16,7 @@ interface Props {
     compressionLevel?: number;
     retryDuration?: number;
     debug?: boolean;
+    loadingSrc?: string;
 }
 
 export type RFBHandler = {
@@ -160,13 +159,13 @@ export const VncScreen = forwardRef((props: Props, ref: React.Ref<RFBHandler>)=>
             >
                 
             </div>
-            {loading?
+            {loading && props.loadingSrc?
             <div style={{
                 color: 'white', 
                 position: 'absolute', 
                 left: screen.current?.offsetWidth!/2 , 
                 top: (screen.current?.offsetHeight!/2 + screen.current?.offsetTop!/2),
-            }}><img alt='loading' src={loader} style={{height: '60px'}} /></div>: null}
+            }}><img alt='loading' src={props.loadingSrc} style={{height: '60px'}} /></div>: null}
         </>
     );
 });
